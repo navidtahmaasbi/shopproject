@@ -2,12 +2,15 @@ package com.example.shopproject.ui.navigation
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.shopproject.ui.screens.ProductDetailScreen
 import com.example.shopproject.ui.screens.ProductListScreen
 import com.example.shopproject.ui.viewmodels.ProductViewModel
+import androidx.compose.runtime.livedata.observeAsState
+
 
 @Composable
 fun NavGraph(viewModel: ProductViewModel) {
@@ -17,33 +20,39 @@ fun NavGraph(viewModel: ProductViewModel) {
         navController = navController,
         startDestination = "productList"
     ) {
-
+        // Product List Screen
         composable("productList") {
             ProductListScreen(
                 viewModel = viewModel,
                 onProductClick = { productId ->
+                    // Navigate to Product Detail Screen with the productId
                     navController.navigate("productDetail/$productId")
                 }
             )
-
-
         }
-        composable("productDetail/{productId}"){backStackEntry ->
 
+        // Product Detail Screen
+        composable("productDetail/{productId}") { backStackEntry ->
+            // Retrieve the productId from the route arguments
             val productId = backStackEntry.arguments?.getString("productId")
             if (productId != null) {
-                val product = viewModel.getProductById(productId)
-                if (product != null){
+                // Observe the product details from the ViewModel
+
+                val product by viewModel.getProductById(productId).observeAsState()
+                if (product != null) {
                     ProductDetailScreen(
                         product = product,
                         onBackClick = {
+                            // Navigate back to the Product List Screen
                             navController.popBackStack()
                         }
                     )
-                }else{
-                    Text("product not found")
+                } else {
+                    // Handle case where product is not found
+                    Text("Product not found")
                 }
-            }else{
+            } else {
+                // Handle case where productId is null
                 Text("Invalid product ID")
             }
         }

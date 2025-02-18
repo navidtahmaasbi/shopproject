@@ -22,4 +22,7 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     fun getProductById(productId: String) : Product?{
         return allProducts.value?.find{it.id.toString() == productId}
     }
+    fun insert(product: Product) = viewModelScope.launch {
+        repository.insert(product)
+    }
 }

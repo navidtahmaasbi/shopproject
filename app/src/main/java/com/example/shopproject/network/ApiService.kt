@@ -1,4 +1,6 @@
 package com.example.shopproject.network
 
-class ApiService {
+interface ApiService {
+    @GET("products")
+    suspend fun getProducts(): List<Product>
 }

@@ -1,5 +1,6 @@
 package com.example.shopproject.ui.navigation
 
+import ProductListScreen
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -7,9 +8,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.shopproject.ui.screens.ProductDetailScreen
-import com.example.shopproject.ui.screens.ProductListScreen
 import com.example.shopproject.ui.viewmodels.ProductViewModel
 import androidx.compose.runtime.livedata.observeAsState
+import com.example.shopproject.data.Product
 
 
 @Composable
@@ -38,7 +39,7 @@ fun NavGraph(viewModel: ProductViewModel) {
             if (productId != null) {
                 // Observe the product details from the ViewModel
 
-                val product by viewModel.getProductById(productId).observeAsState()
+                val product by viewModel.getProductById(productId).observeAsState(Product())
                 if (product != null) {
                     ProductDetailScreen(
                         product = product,
@@ -58,3 +59,4 @@ fun NavGraph(viewModel: ProductViewModel) {
         }
     }
 }
+

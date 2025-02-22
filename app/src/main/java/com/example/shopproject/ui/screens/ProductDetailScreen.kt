@@ -18,23 +18,25 @@ import com.example.shopproject.data.Product
 
 @Composable
 fun ProductDetailScreen(
-    product: Product,
+    product: Product?,
     onBackClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        IconButton(onClick = onBackClick) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+    if (product != null) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            IconButton(onClick = onBackClick) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+            }
+            Text(text = product.name, style = MaterialTheme.typography.titleLarge)
+            Text(text = product.description, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = if (product.isFree) "Free" else "Requires Subscription",
+                style = MaterialTheme.typography.bodySmall,
+                color = if (product.isFree) Color.Green else Color.Red
+            )
         }
-        Text(text = product.name, style = MaterialTheme.typography.titleLarge)
-        Text(text = product.description, style = MaterialTheme.typography.bodyMedium)
-        Text(
-            text = if (product.isFree) "Free" else "Requires Subscription",
-            style = MaterialTheme.typography.bodySmall,
-            color = if (product.isFree) Color.Green else Color.Red
-        )
     }
 }

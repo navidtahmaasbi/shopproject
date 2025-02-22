@@ -9,6 +9,7 @@ import com.example.shopproject.data.AppDatabase
 import com.example.shopproject.data.Product
 import com.example.shopproject.data.ProductDao
 import com.example.shopproject.repository.ProductRepository
+import kotlinx.coroutines.launch
 
 class ProductViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: ProductRepository
@@ -19,8 +20,8 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         repository = ProductRepository(productDao)
         allProducts = repository.allProducts
     }
-    fun getProductById(productId: String) : Product?{
-        return allProducts.value?.find{it.id.toString() == productId}
+    fun getProductById(productId: String) : LiveData<Product?>{
+        return repository.getProductById(productId)
     }
     fun insert(product: Product) = viewModelScope.launch {
         repository.insert(product)

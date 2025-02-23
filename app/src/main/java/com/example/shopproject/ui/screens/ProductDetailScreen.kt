@@ -21,7 +21,9 @@ fun ProductDetailScreen(
     product: Product?,
     onBackClick: () -> Unit
 ) {
-    if (product != null) {
+    if (product == null) {
+        Text("Product not found")
+    }else{
         Column(
             modifier = Modifier
                 .fillMaxSize()

@@ -5,5 +5,5 @@ data class Product (
     val name: String = "نا مشخص",
     val description: String = "بدون توضیحات",
     val isFree: Boolean = false,
-    val imageUrl: String? = null
+    val imageUrl: String? = "https://picsum.photos/300/200"
 )

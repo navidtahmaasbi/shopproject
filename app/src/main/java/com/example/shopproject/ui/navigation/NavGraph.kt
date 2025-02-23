@@ -40,7 +40,7 @@ fun NavGraph(viewModel: ProductViewModel) {
                 // Observe the product details from the ViewModel
 
                 val product by viewModel.getProductById(productId).observeAsState(Product())
-                if (product != null) {
+                if (product?.id != "0") {
                     ProductDetailScreen(
                         product = product,
                         onBackClick = {

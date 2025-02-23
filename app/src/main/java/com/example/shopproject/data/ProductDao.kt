@@ -1,30 +1,44 @@
 package com.example.shopproject.data
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.lifecycle.MutableLiveData
 
-@Dao
-interface ProductDao {
+class ProductDao {
+    private val productList = mutableListOf<Product>()
+    private val productsLiveData = MutableLiveData<List<Product>>(productList)
 
-    // Insert a product into the database
-    @Insert
-    suspend fun insert(product: Product)
+    fun insert(product: Product) {
+        productList.add(product)
+        productsLiveData.value = productList
+    }
 
-    // Get all products from the database
-    @Query("SELECT * FROM products")
-    fun getAllProducts(): LiveData<List<Product>>
+    fun getAllProducts(): LiveData<List<Product>> {
+        return productsLiveData
 
-    // Get a specific product by its ID
-    @Query("SELECT * FROM products WHERE id = :productId")
-    fun getProductById(productId: String): LiveData<Product?>
+    }
 
-    // Delete a product from the database
-    @Query("DELETE FROM products WHERE id = :productId")
-    suspend fun deleteProductById(productId: String)
+    fun getProductById(productId: String): LiveData<Product?> {
+        val product = productList.find {it.id == productId}
+        return MutableLiveData(product)
 
-    // Update a product in the database
-    @Query("UPDATE products SET name = :name, description = :description, isFree = :isFree WHERE id = :productId")
-    suspend fun updateProduct(productId: String, name: String, description: String, isFree: Boolean)
+    }
+    fun deleteProductById(productId: String){
+        val iterator = productList.iterator()
+        while (iterator.hasNext()){
+            val product = iterator.next()
+            if (product.id == productId){
+                iterator.remove()
+            }
+        }
+        productsLiveData.value = productList
+
+    }
+
+    fun updateProduct(productId: String, name: String, description: String, isFree: Boolean){
+        val index = productList.indexOfFirst {it.id == productId}
+        if (index != -1){
+            productList[index] = productList[index].copy(name, description = description, isFree = isFree)
+            productsLiveData.value = productList
+        }
+    }
 }

@@ -21,18 +21,10 @@ class ProductViewModel : ViewModel() {
 
     init {
         _allproducts.value = listOf(
-            Product(
-                id = "1",
-                name = "laptop",
-                description = "this is a laptop",
-                imageUrl = "https://via.placeholder.com/150"
-            ),
-            Product(
-                id = "2",
-                name = "phone",
-                description = "this is a phone",
-                imageUrl = "https://via.placeholder.com/150"
-            )
+            Product(id = "1", name = "Laptop", description = "Gaming Laptop", price = 1200.0, imageUrl = "", category = "Electronics"),
+            Product(id = "2", name = "T-Shirt", description = "Cotton T-Shirt", price = 20.0, imageUrl = "", category = "Clothing"),
+            Product(id = "3", name = "Smartphone", description = "Latest Android Phone", price = 800.0, imageUrl = "", category = "Electronics"),
+            Product(id = "4", name = "Book", description = "Science Fiction Novel", price = 15.0, imageUrl = "", category = "Books")
         )
     }
     fun getProductById(productId: String): LiveData<Product?> {

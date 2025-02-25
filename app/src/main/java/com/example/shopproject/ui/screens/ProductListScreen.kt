@@ -26,25 +26,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.shopproject.ProductItemWithCart
+import com.example.shopproject.ProductItem
 import com.example.shopproject.data.CartViewModel
 import com.example.shopproject.data.Product
+import com.example.shopproject.ui.screens.CategoryFilter
 import com.example.shopproject.ui.viewmodels.ProductViewModel
 
 @Composable
-fun ProductListWithSearch(
+fun ProductList(
     productViewModel: ProductViewModel,
     cartViewModel: CartViewModel,
     modifier: Modifier = Modifier
 ) {
     var isSearching by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("All") }
 
+    val categories = listOf("All","Electronics","Clothing","Books")
     val products by productViewModel.allProducts.observeAsState(emptyList())
-    val filteredProducts = if (searchQuery.isEmpty()) {
-        products
-    } else {
-        products.filter { it.name.contains(searchQuery, ignoreCase = true) }
+
+    val filteredProducts = products.filter {product ->
+    (searchQuery.isEmpty() || product.name.contains(searchQuery, ignoreCase = true)) &&
+            (selectedCategory == "All" || product.category == selectedCategory)
     }
 
     Column {
@@ -57,40 +60,21 @@ fun ProductListWithSearch(
 
         LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
             items(filteredProducts) { product ->
-                ProductItemWithCart(
+                ProductItem(
                     product = product,
                     cartViewModel = cartViewModel,
                     onClick ={/* Handle item click if needed*/})
             }
         }
+        CategoryFilter(
+            categories = listOf("All","Electronics","Clothing","Books"),
+            selectedCategory = selectedCategory,
+            onCategorySelected = { category -> selectedCategory = category }
+        )
     }
 }
 
 
-@Composable
-fun ProductItemCard(
-    product: Product,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable { onClick() }
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(text = product.name, style = MaterialTheme.typography.titleLarge)
-            Text(text = product.description, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                text = if (product.isFree) "Free" else "Requires Subscription",
-                style = MaterialTheme.typography.bodySmall,
-                color = if (product.isFree) Color.Green else Color.Red
-            )
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

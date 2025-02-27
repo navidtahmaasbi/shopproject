@@ -1,4 +1,3 @@
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,15 +7,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -28,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.shopproject.ProductItem
 import com.example.shopproject.data.CartViewModel
-import com.example.shopproject.data.Product
 import com.example.shopproject.ui.screens.CategoryFilter
 import com.example.shopproject.ui.viewmodels.ProductViewModel
 
@@ -42,15 +37,18 @@ fun ProductList(
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All") }
 
-    val categories = listOf("All","Electronics","Clothing","Books")
+    val categories = listOf("All", "Electronics", "Clothing", "Books")
     val products by productViewModel.allProducts.observeAsState(emptyList())
 
-    val filteredProducts = products.filter {product ->
-    (searchQuery.isEmpty() || product.name.contains(searchQuery, ignoreCase = true)) &&
-            (selectedCategory == "All" || product.category == selectedCategory)
+    val filteredProducts = products.filter { product ->
+        (searchQuery.isEmpty() || product.name.contains(searchQuery, ignoreCase = true)) &&
+                (selectedCategory == "All" || product.category == selectedCategory)
     }
 
-    Column {
+    Column(modifier = modifier.fillMaxSize()) {
+        // 🔍 Debugging - Confirm this is running
+
+        // ✅ Search Bar (Already visible for you)
         ShopAppBar(
             searchQuery = searchQuery,
             onSearchQueryChange = { searchQuery = it },
@@ -58,19 +56,27 @@ fun ProductList(
             onSearchToggle = { isSearching = it }
         )
 
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        // ✅ Add Category Filter - Must be ABOVE LazyColumn
+        CategoryFilter(
+            categories = categories,
+            selectedCategory = selectedCategory,
+            onCategorySelected = { selectedCategory = it }
+        )
+
+        // ✅ Product List
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
             items(filteredProducts) { product ->
                 ProductItem(
                     product = product,
                     cartViewModel = cartViewModel,
-                    onClick ={/* Handle item click if needed*/})
+                    onClick = { /* Handle item click */ }
+                )
             }
         }
-        CategoryFilter(
-            categories = listOf("All","Electronics","Clothing","Books"),
-            selectedCategory = selectedCategory,
-            onCategorySelected = { category -> selectedCategory = category }
-        )
     }
 }
 

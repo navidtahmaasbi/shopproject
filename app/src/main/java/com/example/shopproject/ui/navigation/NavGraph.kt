@@ -1,6 +1,6 @@
 package com.example.shopproject.ui.navigation
 
-import ProductListScreen
+import ProductList
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -10,43 +10,39 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shopproject.ui.screens.ProductDetailScreen
 import com.example.shopproject.ui.viewmodels.ProductViewModel
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import com.example.shopproject.data.CartViewModel
 import com.example.shopproject.data.Product
 
 
 @Composable
-fun NavGraph(viewModel: ProductViewModel) {
-    val navController = rememberNavController()
-
+fun NavGraph(navController: NavHostController, productViewModel: ProductViewModel, cartViewModel: CartViewModel) {
     NavHost(
         navController = navController,
         startDestination = "productList"
     ) {
         // Product List Screen
         composable("productList") {
-            ProductListScreen(
-                viewModel = viewModel,
-                onProductClick = { productId ->
-                    // Navigate to Product Detail Screen with the productId
-                    navController.navigate("productDetail/$productId")
-                }
+            ProductList(
+                productViewModel = productViewModel,
+                cartViewModel = cartViewModel,
+                modifier = Modifier
             )
         }
 
+
         // Product Detail Screen
         composable("productDetail/{productId}") { backStackEntry ->
-            // Retrieve the productId from the route arguments
+
             val productId = backStackEntry.arguments?.getString("productId")
             if (productId != null) {
-                // Observe the product details from the ViewModel
 
-                val product by viewModel.getProductById(productId).observeAsState(Product())
+                val product by productViewModel.getProductById(productId).observeAsState(Product())
                 if (product?.id != "0") {
                     ProductDetailScreen(
                         product = product,
-                        onBackClick = {
-                            // Navigate back to the Product List Screen
-                            navController.popBackStack()
-                        }
+                        onBackClick = { navController.popBackStack() }
                     )
                 } else {
                     // Handle case where product is not found

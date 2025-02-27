@@ -6,53 +6,56 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.shopproject.ui.screens.ProductDetailScreen
 import com.example.shopproject.ui.viewmodels.ProductViewModel
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.example.shopproject.data.CartViewModel
-import com.example.shopproject.data.Product
-
+import com.example.shopproject.ui.screens.CartScreen
+import com.example.shopproject.ui.screens.HomeScreen
+import com.example.shopproject.ui.screens.ProfileScreen
 
 @Composable
-fun NavGraph(navController: NavHostController, productViewModel: ProductViewModel, cartViewModel: CartViewModel) {
+fun NavGraph(
+    navController: NavHostController,
+    productViewModel: ProductViewModel,
+    cartViewModel: CartViewModel,
+    modifier: Modifier = Modifier
+) {
     NavHost(
         navController = navController,
-        startDestination = "productList"
+        startDestination = "home",
+        modifier = modifier
     ) {
-        // Product List Screen
-        composable("productList") {
-            ProductList(
+        composable("home") {
+            HomeScreen(
                 productViewModel = productViewModel,
                 cartViewModel = cartViewModel,
-                modifier = Modifier
+                onProductClick = { productId ->
+                    navController.navigate("productDetail/$productId")
+                }
             )
         }
+        composable("cart") { CartScreen(cartViewModel) }
+        composable("profile") { ProfileScreen() }
 
-
-        // Product Detail Screen
         composable("productDetail/{productId}") { backStackEntry ->
-
             val productId = backStackEntry.arguments?.getString("productId")
             if (productId != null) {
-
-                val product by productViewModel.getProductById(productId).observeAsState(Product())
-                if (product?.id != "0") {
+                val product by productViewModel.getProductById(productId).observeAsState()
+                product?.let {
                     ProductDetailScreen(
-                        product = product,
+                        productId = productId,
+                        productViewModel = productViewModel,
                         onBackClick = { navController.popBackStack() }
                     )
-                } else {
-                    // Handle case where product is not found
-                    Text("Product not found")
-                }
+                } ?: Text("Product not found")
             } else {
-                // Handle case where productId is null
                 Text("Invalid product ID")
             }
         }
     }
 }
+
 

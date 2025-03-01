@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -19,8 +20,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -31,9 +35,20 @@ import java.util.UUID
 @Composable
 fun AdminPanelScreen(
     productViewModel: ProductViewModel,
-    onProductClick: (String) -> Unit
+    onProductClick: (Product) -> Unit
 ) {
-    val productList by productViewModel.allProducts.collectAsState()
+    val productList by productViewModel.allProducts.observeAsState(emptyList())
+    var selectedProduct by remember { mutableStateOf<Product?>(null) }
+    var isEditing by remember { mutableStateOf(false) }
+
+    if (isEditing){
+        ProductFormScreen(
+            product = selectedProduct,
+            productViewModel = productViewModel,
+            onFormSubmit = { isEditing = false }
+        )
+    } else {
+
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)){
         Text(
@@ -42,23 +57,30 @@ fun AdminPanelScreen(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        LazyColumn{
-            items(productList){ product ->
-                ProductAdminItem(product, onEdit = {onProductEdit(product) }){
-                    productViewModel.deleteProduct(product.id)
-                }
+        LazyColumn {
+            items(productList) { product ->
+                ProductAdminItem(
+                    product = product,
+                    onEdit = {
+                        selectedProduct = product
+                        isEditing = true
+                    },
+                    onDelete = { productViewModel.deleteProduct(product.id) }
+                )
             }
         }
 
         Button(
-            onClick = {onProductEdit(null)},
+            onClick = {
+                selectedProduct = null
+                isEditing = true
+            },
             modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-
-        ){
-            Text("Add New product")
+        ) {
+            Text("Add New Product")
         }
-
     }
+}
 }
 
 
@@ -94,7 +116,7 @@ fun ProductFormScreen(
 ){
     var name by remember {mutableStateOf(product?.name?: "")}
     var description by remember {mutableStateOf(product?.description?: "")}
-    var price by remember {mutableStateOf(product?.price?: "")}
+    var price by remember {mutableStateOf(product?.price?.toString()?: "")}
     var imageUrl by remember {mutableStateOf(product?.imageUrl?: "")}
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)){
@@ -157,10 +179,9 @@ fun AdminNavGraph(productViewModel: ProductViewModel, onBackClick: () -> Unit) {
     if (isEditing) {
         ProductFormScreen(
             product = selectedProduct,
-            productViewModel = productViewModel
-        ) {
-            isEditing = false
-        }
+            productViewModel = productViewModel,
+            onFormSubmit = { isEditing = false }
+        )
     } else {
         AdminPanelScreen(productViewModel) { product ->
             selectedProduct = product

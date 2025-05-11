@@ -1,5 +1,7 @@
 package com.example.shopproject.data
 
+
+
 data class Product (
     val id: String = "",
     val name: String = "نا مشخص",

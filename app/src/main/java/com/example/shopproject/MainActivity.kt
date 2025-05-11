@@ -20,8 +20,6 @@ import com.example.shopproject.ui.navigation.BottomNavigationBar
 import com.example.shopproject.ui.navigation.NavGraph
 import com.example.shopproject.ui.theme.ShopProjectTheme
 import com.example.shopproject.ui.viewmodels.ProductViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 class MainActivity : ComponentActivity() {
